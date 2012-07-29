@@ -1,4 +1,35 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+/**
+ * CodeIgniter
+ *
+ * An open source application development framework for PHP 5.2.4 or newer
+ *
+ * NOTICE OF LICENSE
+ *
+ * Licensed under the Academic Free License version 3.0
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0) that is
+ * bundled with this package in the files license_afl.txt / license_afl.rst.
+ * It is also available through the world wide web at this URL:
+ * http://opensource.org/licenses/AFL-3.0
+ * If you did not receive a copy of the license and are unable to obtain it
+ * through the world wide web, please send an email to
+ * licensing@ellislab.com so we can send you a copy immediately.
+ *
+ * @package		CodeIgniter
+ * @author		EllisLab Dev Team
+ * @copyright	Copyright (c) 2008 - 2012, EllisLab, Inc. (http://ellislab.com/)
+ * @license		http://opensource.org/licenses/AFL-3.0 Academic Free License (AFL 3.0)
+ * @link		http://codeigniter.com
+ * @since		Version 1.0
+ * @filesource
+ */
+
+mb_internal_encoding("utf8");	// set default encoding
+date_default_timezone_set('Europe/London'); //	set default server timezone
+
+//	generic
+define("AUTH_SALT", "RxqZ1;%7Ur0M.y}VF+]o}WPuy%W7oUDjwyat)e6r.w{OiUGj0(%u7aTH~v]n,Q-}K{@@5X~.lnM6u+FI", true);
 
 /*
 |--------------------------------------------------------------------------
@@ -14,13 +45,22 @@
 | path to your installation.
 |
 */
-$config['base_url']	= '';
+#$config['base_url']	= '';
+$server_host = $_SERVER['HTTP_HOST'];
+if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") {
+	//	the WLP doesn't support SSL
+	$host = "https://secure.matchboxhq.com/secure-wlp/" . $server_host;
+} else {
+	$host = $server_host;
+}
+$config['base_url'] = $host; //$_SERVER['HTTP_HOST'];
 
 /*
 |--------------------------------------------------------------------------
 | Index File
 |--------------------------------------------------------------------------
 |
+
 | Typically this will be your index.php file, unless you've renamed it to
 | something else. If you are using mod_rewrite to remove the page set this
 | variable so that it is blank.
@@ -79,6 +119,8 @@ $config['language']	= 'english';
 | This determines which character set is used by default in various methods
 | that require a character set to be provided.
 |
+| See http://php.net/htmlspecialchars for a list of supported charsets.
+|
 */
 $config['charset'] = 'UTF-8';
 
@@ -88,10 +130,10 @@ $config['charset'] = 'UTF-8';
 |--------------------------------------------------------------------------
 |
 | If you would like to use the 'hooks' feature you must enable it by
-| setting this variable to TRUE (boolean).  See the user guide for details.
+| setting this variable to true (boolean).  See the user guide for details.
 |
 */
-$config['enable_hooks'] = FALSE;
+$config['enable_hooks'] = false;
 
 
 /*
@@ -138,12 +180,12 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
 | example.com/who/what/where/
 |
 | By default CodeIgniter enables access to the $_GET array.  If for some
-| reason you would like to disable it, set 'allow_get_array' to FALSE.
+| reason you would like to disable it, set 'allow_get_array' to false.
 |
 | You can optionally enable standard query string based URLs:
 | example.com?who=me&what=something&where=here
 |
-| Options are: TRUE or FALSE (boolean)
+| Options are: true or false (boolean)
 |
 | The other items let you set the query string 'words' that will
 | invoke your controllers and its functions:
@@ -154,8 +196,8 @@ $config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
 | use segment based URLs.
 |
 */
-$config['allow_get_array']		= TRUE;
-$config['enable_query_strings'] = FALSE;
+$config['allow_get_array']		= true;
+$config['enable_query_strings'] = false;
 $config['controller_trigger']	= 'c';
 $config['function_trigger']		= 'm';
 $config['directory_trigger']	= 'd'; // experimental not currently in use
@@ -175,6 +217,10 @@ $config['directory_trigger']	= 'd'; // experimental not currently in use
 |	2 = Debug Messages
 |	3 = Informational Messages
 |	4 = All Messages
+|
+| You can also pass in a array with threshold levels to show individual error types
+|
+| 	array(2) = Debug Messages, without Error Messages
 |
 | For a live site you'll usually only enable Errors (1) to be logged otherwise
 | your log files will fill up very fast.
@@ -223,8 +269,11 @@ $config['cache_path'] = '';
 | If you use the Encryption class or the Session class you
 | MUST set an encryption key.  See the user guide for info.
 |
+| http://codeigniter.com/user_guide/libraries/encryption.html
+| http://codeigniter.com/user_guide/libraries/sessions.html
+|
 */
-$config['encryption_key'] = '';
+$config['encryption_key'] = 'MatchboxHQ_1s_th3_b35t_p14tf0rm_in_th3_w0r1d';
 
 /*
 |--------------------------------------------------------------------------
@@ -244,14 +293,14 @@ $config['encryption_key'] = '';
 | 'sess_time_to_update'		= how many seconds between CI refreshing Session Information
 |
 */
-$config['sess_cookie_name']		= 'ci_session';
+$config['sess_cookie_name']		= 'matchboxhq';
 $config['sess_expiration']		= 7200;
-$config['sess_expire_on_close']	= FALSE;
-$config['sess_encrypt_cookie']	= FALSE;
-$config['sess_use_database']	= FALSE;
+$config['sess_expire_on_close']	= false;
+$config['sess_encrypt_cookie']	= false;
+$config['sess_use_database']	= false;
 $config['sess_table_name']		= 'ci_sessions';
-$config['sess_match_ip']		= FALSE;
-$config['sess_match_useragent']	= TRUE;
+$config['sess_match_ip']		= false;
+$config['sess_match_useragent']	= true;
 $config['sess_time_to_update']	= 300;
 
 /*
@@ -263,12 +312,14 @@ $config['sess_time_to_update']	= 300;
 | 'cookie_domain' = Set to .your-domain.com for site-wide cookies
 | 'cookie_path'   =  Typically will be a forward slash
 | 'cookie_secure' =  Cookies will only be set if a secure HTTPS connection exists.
+| 'cookie_httponly' = Cookie will only be accessible via HTTP(S) (no javascript)
 |
 */
-$config['cookie_prefix']	= "";
-$config['cookie_domain']	= "";
-$config['cookie_path']		= "/";
-$config['cookie_secure']	= FALSE;
+$config['cookie_prefix']	= '';
+$config['cookie_domain']	= '';
+$config['cookie_path']		= '/';
+$config['cookie_secure']	= false;
+$config['cookie_httponly'] 	= false;
 
 /*
 |--------------------------------------------------------------------------
@@ -279,24 +330,28 @@ $config['cookie_secure']	= FALSE;
 | COOKIE data is encountered
 |
 */
-$config['global_xss_filtering'] = FALSE;
+$config['global_xss_filtering'] = true;
 
 /*
 |--------------------------------------------------------------------------
 | Cross Site Request Forgery
 |--------------------------------------------------------------------------
-| Enables a CSRF cookie token to be set. When set to TRUE, token will be
+| Enables a CSRF cookie token to be set. When set to true, token will be
 | checked on a submitted form. If you are accepting user data, it is strongly
 | recommended CSRF protection be enabled.
 |
 | 'csrf_token_name' = The token name
 | 'csrf_cookie_name' = The cookie name
 | 'csrf_expire' = The number in seconds the token should expire.
+| 'csrf_regenerate' = Regenerate token on every submission
+| 'csrf_exclude_uris' = Array of URIs which ignore CSRF checks
 */
-$config['csrf_protection'] = FALSE;
+$config['csrf_protection'] = false;
 $config['csrf_token_name'] = 'csrf_test_name';
 $config['csrf_cookie_name'] = 'csrf_cookie_name';
 $config['csrf_expire'] = 7200;
+$config['csrf_regenerate'] = true;
+$config['csrf_exclude_uris'] = array();
 
 /*
 |--------------------------------------------------------------------------
@@ -315,21 +370,32 @@ $config['csrf_expire'] = 7200;
 | by the output class.  Do not 'echo' any values with compression enabled.
 |
 */
-$config['compress_output'] = FALSE;
+$config['compress_output'] = false;
+
+/*
+|--------------------------------------------------------------------------
+| Minify
+|--------------------------------------------------------------------------
+|
+| Removes extra characters (usually unnecessary spaces) from your
+| output for faster page load speeds.  Makes your outputted HTML source
+| code less readable.
+|
+*/
+$config['minify_output'] = false;
 
 /*
 |--------------------------------------------------------------------------
 | Master Time Reference
 |--------------------------------------------------------------------------
 |
-| Options are 'local' or 'gmt'.  This pref tells the system whether to use
-| your server's local time as the master 'now' reference, or convert it to
-| GMT.  See the 'date helper' page of the user guide for information
-| regarding date handling.
+| Options are 'local' or any PHP supported timezone. This preference tells
+| the system whether to use your server's local time as the master 'now'
+| reference, or convert it to the configured one timezone. See the 'date
+| helper' page of the user guide for information regarding date handling.
 |
 */
 $config['time_reference'] = 'local';
-
 
 /*
 |--------------------------------------------------------------------------
@@ -338,11 +404,10 @@ $config['time_reference'] = 'local';
 |
 | If your PHP installation does not have short tag support enabled CI
 | can rewrite the tags on-the-fly, enabling you to utilize that syntax
-| in your view files.  Options are TRUE or FALSE (boolean)
+| in your view files.  Options are true or false (boolean)
 |
 */
-$config['rewrite_short_tags'] = FALSE;
-
+$config['rewrite_short_tags'] = false;
 
 /*
 |--------------------------------------------------------------------------
@@ -356,7 +421,6 @@ $config['rewrite_short_tags'] = FALSE;
 |
 */
 $config['proxy_ips'] = '';
-
 
 /* End of file config.php */
 /* Location: ./application/config/config.php */
